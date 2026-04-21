@@ -1,62 +1,141 @@
-# League of Legends Basic Cleaning Mod 
+# League of Legends Basic Cleaning Mod
 
-**A text-replacement mod to remove offensive/religious content and adjust announcer voice lines.**
+This repository is a small workflow for editing English League of Legends text, rebuilding Riot `.stringtable` files, and packaging the result for use with CSLoL Manager.
 
----
+The main use case is simple text cleanup:
+- remove or neutralize specific words or phrases
+- rebuild `lol.stringtable` from the edited JSON
+- package the result as a CSLoL-compatible mod
 
-## 📖 Overview
-This mod replaces specific in-game text strings and removes one announcer voice line to create a more neutral gaming environment. Examples include:
-- `___ like` → `Legendary`
-- `Tears of ____` → `Mana Package`
-- Removes 1 announcer line (specified in changelog)
+## What This Repo Contains
 
----
+- [JsonToStringtable.py](C:/Users/themi/league-of-legends-basic-cleaning/JsonToStringtable.py)
+  Converts a modern `lol.stringtable.json` file back into Riot's `version 5` `.stringtable` format.
 
-## 🛠️ Installation Guide
+- [sanitize_lol_terms.py](C:/Users/themi/league-of-legends-basic-cleaning/sanitize_lol_terms.py)
+  Applies repeatable text replacements to the JSON before rebuilding the stringtable.
 
-### Prerequisites
-1. **League of Legends** (latest patch compatible)
-2. **CSLOL Manager** ([download here](https://github.com/LeagueToolkit/cslol-manager/releases)) ( you can find the latest version on cslol repo but some time they have prereleases)
+- `mods.zip`
+  Sample `.fantome` mod packages kept as references.
 
-### Setup
-1. **Install CSLOL Manager**
-   - Download and extract to a **separate folder**
-   - Run `cslol-manager.exe`
+## Current Workflow
 
-2. **Configure Game Path**
-   - Click "Browse" in CSLOL Manager
-   - Navigate to: `C:\Riot Games\League of Legends\Game\`
-   - Select `League of Legends.exe`
+1. Export or obtain the latest English `lol.stringtable.json`
+2. Edit the text manually or run the sanitizer script
+3. Rebuild `lol.stringtable`
+4. Place the rebuilt file into a WAD mod structure
+5. Package it for CSLoL Manager as a folder or `.fantome`
 
-3. **Install Mod**
-   - Drag-and-drop `.fantome` files from `readyModsFolder`
-   - Check mod's checkbox
-   - Click **RUN**
+## Supported File Format
 
-4. **Verify**
-   - Launch League Client
-   - Check text changes in abilities/items
-   - Test announcer in Practice Tool
+The converter in this repo is built around the current Riot format used by modern `lol.stringtable` files:
 
----
+- `RST` version `5`
+- modern JSON shape:
+  - top-level `version`
+  - top-level `entries`
+- hashed keys are preserved when already written as `{...}`
+- plain text keys are rehashed during rebuild
+- duplicate text values are deduplicated so the rebuilt file stays compatible with Riot's shared-string layout
 
-## 🔧 Tools
-- **BNK-GUI**: Edit sound banks/voice lines
-- **RION**: Work with Riot's encrypted files (no longer a thing sadly)
-- **Community Dragon Tools**: Advanced data mining/editing
+This means the script is designed for current League text files, not older legacy formats.
 
+## Quick Start
 
----
-##  Json to stringtables
-- You can use the python script i made to do so [Change the input_file to your file path or better just make your GUI as I am just too lazy to do it xd ]
-- You can add this file to CDTB and fetch the hashes and use it with the latest hashes
-- For stringtable to json you can use the export.py from CDTB
+### 1. Sanitize or edit the JSON
 
+Example:
 
----
-### v1.0.0 (2024-05-22)
-- Compatible with LoL 25.10
----
-## ✨ Credits
-- **Tools**: GuiSa, Wenveo, Crauzer Moonshadow565 & LeagueToolkit
+```powershell
+python "C:\Users\themi\league-of-legends-basic-cleaning\sanitize_lol_terms.py" "D:\Games Installation\lol.stringtable.json"
+```
 
+If you want to write to a separate output file first:
+
+```powershell
+python "C:\Users\themi\league-of-legends-basic-cleaning\sanitize_lol_terms.py" "D:\Games Installation\lol.stringtable.json" --output "C:\temp\lol.stringtable.cleaned.json"
+```
+
+### 2. Rebuild the stringtable
+
+```powershell
+python "C:\Users\themi\league-of-legends-basic-cleaning\JsonToStringtable.py" "D:\Games Installation\lol.stringtable.json" "D:\Games Installation\lol.stringtable"
+```
+
+## Building a CSLoL Mod
+
+The rebuilt file belongs at this internal game path:
+
+```text
+data/menu/en_us/lol.stringtable
+```
+
+To package it as a CSLoL WAD, create a folder like this:
+
+```text
+my-mod/
+  data/
+    menu/
+      en_us/
+        lol.stringtable
+```
+
+Then build the WAD with `wad-make.exe` from CSLoL tools:
+
+```powershell
+wad-make.exe "C:\path\to\my-mod"
+```
+
+That produces a WAD file you can place inside a CSLoL mod folder:
+
+```text
+MyMod/
+  META/
+    info.json
+  WAD/
+    Global.en_US.wad.client
+```
+
+If you want a drag-and-drop import file, zip the mod folder contents and rename the archive to `.fantome`.
+
+## Example CSLoL Metadata
+
+Example `META/info.json`:
+
+```json
+{
+  "Name": "Neutral Text Filter",
+  "Author": "YourName",
+  "Version": "1.0.0",
+  "Description": "English text cleanup mod for League of Legends."
+}
+```
+
+## Notes About Text Editing
+
+- Changing values is safe as long as the JSON structure stays valid.
+- Changing internal keys is more risky because keys are tied to hashing and lookup behavior.
+- If a visible string uses a hashed key like `{00003bb5e4}`, the converter keeps that hash as-is.
+- If a visible string uses a plain text key, the converter rebuilds its hash automatically.
+
+## Tooling References
+
+- [CSLoL Manager](https://github.com/LeagueToolkit/cslol-manager/releases)
+- CommunityDragon data and hash research
+- Riot stringtable exports from your own game files or CDTB-based tooling
+
+## Repo Status
+
+This repository is focused on text editing and rebuild tooling, not on shipping one single final mod. Think of it as a working project for:
+
+- editing League text safely
+- rebuilding `.stringtable`
+- producing CSLoL-ready output
+
+## Credits
+
+Thanks to the League modding and tooling community, especially the people behind:
+
+- LeagueToolkit / CSLoL Manager
+- CommunityDragon
+- CDTB and related Riot file format research
