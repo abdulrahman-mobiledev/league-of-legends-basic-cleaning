@@ -98,19 +98,6 @@ MyMod/
 
 If you want a drag-and-drop import file, zip the mod folder contents and rename the archive to `.fantome`.
 
-## Example CSLoL Metadata
-
-Example `META/info.json`:
-
-```json
-{
-  "Name": "Neutral Text Filter",
-  "Author": "YourName",
-  "Version": "1.0.0",
-  "Description": "English text cleanup mod for League of Legends."
-}
-```
-
 ## Notes About Text Editing
 
 - Changing values is safe as long as the JSON structure stays valid.
