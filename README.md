@@ -1,22 +1,19 @@
-# League of Legends Basic Cleaning Mod
+# League of Legends Text Cleanup Mod for CSLoL
 
-This repository is a small workflow for editing English League of Legends text, rebuilding Riot `.stringtable` files, and packaging the result for use with CSLoL Manager.
+This repository is a workflow for editing English League of Legends text, rebuilding Riot `.stringtable` files, and packaging the result for use with CSLoL Manager.
 
-The main use case is simple text cleanup:
+The main use case is text cleanup for a CSLoL-compatible League mod:
 - remove or neutralize specific words or phrases
 - rebuild `lol.stringtable` from the edited JSON
 - package the result as a CSLoL-compatible mod
 
 ## What This Repo Contains
 
-- [JsonToStringtable.py](C:/Users/themi/league-of-legends-basic-cleaning/JsonToStringtable.py)
+- `JsonToStringtable.py`
   Converts a modern `lol.stringtable.json` file back into Riot's `version 5` `.stringtable` format.
 
-- [sanitize_lol_terms.py](C:/Users/themi/league-of-legends-basic-cleaning/sanitize_lol_terms.py)
+- `sanitize_lol_terms.py`
   Applies repeatable text replacements to the JSON before rebuilding the stringtable.
-
-- `mods.zip`
-  Sample `.fantome` mod packages kept as references.
 
 ## Current Workflow
 
@@ -47,19 +44,19 @@ This means the script is designed for current League text files, not older legac
 Example:
 
 ```powershell
-python "C:\Users\themi\league-of-legends-basic-cleaning\sanitize_lol_terms.py" "D:\Games Installation\lol.stringtable.json"
+python .\sanitize_lol_terms.py "X:\path\to\lol.stringtable.json"
 ```
 
 If you want to write to a separate output file first:
 
 ```powershell
-python "C:\Users\themi\league-of-legends-basic-cleaning\sanitize_lol_terms.py" "D:\Games Installation\lol.stringtable.json" --output "C:\temp\lol.stringtable.cleaned.json"
+python .\sanitize_lol_terms.py "X:\path\to\lol.stringtable.json" --output "X:\path\to\lol.stringtable.cleaned.json"
 ```
 
 ### 2. Rebuild the stringtable
 
 ```powershell
-python "C:\Users\themi\league-of-legends-basic-cleaning\JsonToStringtable.py" "D:\Games Installation\lol.stringtable.json" "D:\Games Installation\lol.stringtable"
+python .\JsonToStringtable.py "X:\path\to\lol.stringtable.json" "X:\path\to\lol.stringtable"
 ```
 
 ## Building a CSLoL Mod
@@ -83,7 +80,7 @@ my-mod/
 Then build the WAD with `wad-make.exe` from CSLoL tools:
 
 ```powershell
-wad-make.exe "C:\path\to\my-mod"
+wad-make.exe "X:\path\to\my-mod"
 ```
 
 That produces a WAD file you can place inside a CSLoL mod folder:
@@ -113,7 +110,7 @@ If you want a drag-and-drop import file, zip the mod folder contents and rename 
 
 ## Repo Status
 
-This repository is focused on text editing and rebuild tooling, not on shipping one single final mod. Think of it as a working project for:
+This repository is focused on text editing and rebuild tooling for a CSLoL release, not on shipping only one static archive. Think of it as a working project for:
 
 - editing League text safely
 - rebuilding `.stringtable`
